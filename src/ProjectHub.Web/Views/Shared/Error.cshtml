@@ -1,0 +1,15 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "系统错误";
+}
+
+<div class="card">
+    <div class="card-body p-4">
+        <h1 class="h4 text-danger mb-3">发生了错误</h1>
+        <p class="text-muted mb-2">处理请求时出现异常，请稍后重试。</p>
+        @if (Model.ShowRequestId)
+        {
+            <p class="small text-muted mb-0">请求编号：<code>@Model.RequestId</code></p>
+        }
+    </div>
+</div>
