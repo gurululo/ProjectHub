@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectHub.Web.Models.ViewModels;
 
@@ -11,6 +12,7 @@ namespace ProjectHub.Web.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         public IActionResult Error()
         {
             return View(new ErrorViewModel

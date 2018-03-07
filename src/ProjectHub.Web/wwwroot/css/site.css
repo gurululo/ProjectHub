@@ -82,3 +82,50 @@ body {
     color: #8a97a8;
     font-size: 13px;
 }
+
+.app-navbar .navbar-text {
+    white-space: nowrap;
+}
+
+.validation-summary-valid,
+.field-validation-valid {
+    display: none;
+}
+
+.login-body {
+    background: linear-gradient(135deg, #20364d 0%, #2f5d8a 100%);
+}
+
+.login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    border: 0;
+    border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(10, 30, 50, 0.22);
+}
+
+.login-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background-color: #1d4e89;
+    color: #fff;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.login-card .card-footer {
+    border-top-color: #edf0f4;
+}
