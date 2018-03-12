@@ -87,6 +87,92 @@ body {
     white-space: nowrap;
 }
 
+.page-title {
+    color: #22364a;
+    font-weight: 600;
+}
+
+.page-subtitle {
+    color: #7b8898;
+    font-size: 13px;
+}
+
+.app-table thead th {
+    padding: 12px 16px;
+    background-color: #f7f9fc;
+    border-top: 0;
+    border-bottom: 1px solid #e5e9ef;
+    color: #6b7a8c;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.app-table tbody td {
+    padding: 14px 16px;
+    border-color: #edf0f4;
+    vertical-align: middle;
+}
+
+.app-table tbody tr:hover {
+    background-color: #f9fbfd;
+}
+
+.badge {
+    padding: 0.38em 0.62em;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+.badge-soft-secondary {
+    background-color: #eef2f6;
+    color: #5a6a7a;
+}
+
+.badge-soft-primary {
+    background-color: #e8f0fb;
+    color: #1d4e89;
+}
+
+.badge-soft-success {
+    background-color: #e6f5ec;
+    color: #1e7b45;
+}
+
+.badge-soft-warning {
+    background-color: #fff4d6;
+    color: #9a6700;
+}
+
+.badge-soft-danger {
+    background-color: #fde8e8;
+    color: #b42318;
+}
+
+.required-mark {
+    margin-left: 3px;
+    color: #d9534f;
+}
+
+.text-pre-line {
+    white-space: pre-line;
+}
+
+.form-control:focus {
+    border-color: #80a8d6;
+    box-shadow: 0 0 0 0.2rem rgba(29, 78, 137, 0.12);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom-color: #e5e9ef;
+    font-weight: 600;
+}
+
+.card-footer {
+    border-top-color: #e5e9ef;
+}
+
 .validation-summary-valid,
 .field-validation-valid {
     display: none;
