@@ -1,41 +1,111 @@
-@model Project
+@model ProjectDetailsViewModel
 @{
     ViewData["Title"] = "项目详情";
 }
 
 <div class="page-header d-flex justify-content-between align-items-start mb-3">
     <div>
-        <h1 class="h4 page-title mb-1">@Model.Name</h1>
-        <p class="page-subtitle mb-0">项目详情与基础信息</p>
+        <h1 class="h4 page-title mb-1">@Model.Project.Name</h1>
+        <p class="page-subtitle mb-0">项目详情与关联任务</p>
     </div>
     <div class="text-nowrap">
         <a class="btn btn-outline-secondary btn-sm" asp-action="Index">返回列表</a>
-        <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Id">编辑项目</a>
-        <a class="btn btn-outline-danger btn-sm" asp-action="Delete" asp-route-id="@Model.Id">删除项目</a>
+        <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@Model.Project.Id">编辑项目</a>
+        <a class="btn btn-outline-danger btn-sm" asp-action="Delete" asp-route-id="@Model.Project.Id">删除项目</a>
     </div>
 </div>
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>基础信息</span>
-        <span class="badge @Model.Status.ToBadgeClass()">@Model.Status.GetDisplayName()</span>
+        <span class="badge @Model.Project.Status.ToBadgeClass()">@Model.Project.Status.GetDisplayName()</span>
     </div>
     <div class="card-body">
         <dl class="row mb-0">
             <dt class="col-sm-2">项目描述</dt>
-            <dd class="col-sm-10 text-pre-line">@(string.IsNullOrWhiteSpace(Model.Description) ? "暂无描述" : Model.Description)</dd>
+            <dd class="col-sm-10 text-pre-line">@(string.IsNullOrWhiteSpace(Model.Project.Description) ? "暂无描述" : Model.Project.Description)</dd>
 
             <dt class="col-sm-2">开始日期</dt>
-            <dd class="col-sm-10">@Model.StartDate.ToString("yyyy-MM-dd")</dd>
+            <dd class="col-sm-10">@Model.Project.StartDate.ToString("yyyy-MM-dd")</dd>
 
             <dt class="col-sm-2">结束日期</dt>
-            <dd class="col-sm-10">@Model.EndDate.ToString("yyyy-MM-dd")</dd>
+            <dd class="col-sm-10">@Model.Project.EndDate.ToString("yyyy-MM-dd")</dd>
 
             <dt class="col-sm-2">创建时间</dt>
-            <dd class="col-sm-10">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+            <dd class="col-sm-10">@Model.Project.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
 
             <dt class="col-sm-2">更新时间</dt>
-            <dd class="col-sm-10 mb-0">@Model.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+            <dd class="col-sm-10 mb-0">@Model.Project.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
         </dl>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            任务列表
+            <span class="text-muted small ml-2">已完成 @Model.CompletedTaskCount / @Model.TaskCount</span>
+        </div>
+        <a class="btn btn-primary btn-sm" asp-controller="Tasks" asp-action="Create" asp-route-projectId="@Model.Project.Id">＋ 新增任务</a>
+    </div>
+
+    @if (Model.TaskCount > 0)
+    {
+        <div class="px-3 pt-3">
+            <div class="progress progress-thin">
+                <div class="progress-bar bg-success" role="progressbar" style="width: @(Model.Progress)%" aria-valuenow="@Model.Progress" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-hover app-table mb-0">
+            <thead>
+                <tr>
+                    <th>任务名称</th>
+                    <th>截止日期</th>
+                    <th>状态</th>
+                    <th class="text-right">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Tasks.Count == 0)
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-5">该项目暂无任务，点击右上角“新增任务”创建。</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var task in Model.Tasks)
+                    {
+                        <tr>
+                            <td>
+                                <a class="font-weight-bold" asp-controller="Tasks" asp-action="Details" asp-route-id="@task.Id">@task.Name</a>
+                                @if (!string.IsNullOrWhiteSpace(task.Description))
+                                {
+                                    <div class="text-muted small text-truncate" style="max-width: 360px;">@task.Description</div>
+                                }
+                            </td>
+                            <td>
+                                @task.DueDate.ToString("yyyy-MM-dd")
+                                @if (task.Status != ProjectTaskStatus.Completed && task.DueDate.Date < DateTime.Today)
+                                {
+                                    <span class="badge badge-soft-danger ml-1">已逾期</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @task.Status.ToBadgeClass()">@task.Status.GetDisplayName()</span>
+                            </td>
+                            <td class="text-right text-nowrap">
+                                <a class="btn btn-link btn-sm" asp-controller="Tasks" asp-action="Details" asp-route-id="@task.Id">查看</a>
+                                <a class="btn btn-link btn-sm" asp-controller="Tasks" asp-action="Edit" asp-route-id="@task.Id">编辑</a>
+                                <a class="btn btn-link btn-sm text-danger" asp-controller="Tasks" asp-action="Delete" asp-route-id="@task.Id">删除</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
     </div>
 </div>

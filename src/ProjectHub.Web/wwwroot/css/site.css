@@ -173,6 +173,16 @@ body {
     border-top-color: #e5e9ef;
 }
 
+.progress-thin {
+    height: 6px;
+    background-color: #edf1f5;
+    border-radius: 3px;
+}
+
+.progress-thin .progress-bar {
+    border-radius: 3px;
+}
+
 .validation-summary-valid,
 .field-validation-valid {
     display: none;

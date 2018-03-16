@@ -37,5 +37,20 @@ namespace ProjectHub.Web.Helpers
                     return "badge-soft-secondary";
             }
         }
+
+        public static string ToBadgeClass(this ProjectTaskStatus status)
+        {
+            switch (status)
+            {
+                case ProjectTaskStatus.Pending:
+                    return "badge-soft-warning";
+                case ProjectTaskStatus.InProgress:
+                    return "badge-soft-primary";
+                case ProjectTaskStatus.Completed:
+                    return "badge-soft-success";
+                default:
+                    return "badge-soft-secondary";
+            }
+        }
     }
 }

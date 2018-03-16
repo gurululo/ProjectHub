@@ -1,0 +1,36 @@
+@model ProjectTask
+
+<div class="form-group">
+    <label asp-for="Name"></label><span class="required-mark">*</span>
+    <input asp-for="Name" class="form-control" placeholder="请输入任务名称" />
+    <span asp-validation-for="Name" class="text-danger small"></span>
+</div>
+
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label asp-for="ProjectId"></label><span class="required-mark">*</span>
+        <select asp-for="ProjectId" asp-items="ViewBag.Projects" class="form-control"></select>
+        <span asp-validation-for="ProjectId" class="text-danger small"></span>
+    </div>
+    <div class="form-group col-md-6">
+        <label asp-for="DueDate"></label><span class="required-mark">*</span>
+        <input asp-for="DueDate" class="form-control" />
+        <span asp-validation-for="DueDate" class="text-danger small"></span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label asp-for="Description"></label>
+    <textarea asp-for="Description" class="form-control" rows="4" placeholder="补充任务说明、验收标准等信息"></textarea>
+    <span asp-validation-for="Description" class="text-danger small"></span>
+</div>
+
+<div class="form-group mb-0">
+    <label asp-for="Status"></label><span class="required-mark">*</span>
+    <select asp-for="Status" class="form-control">
+        <option value="0" selected="@(Model.Status == ProjectTaskStatus.Pending)">待处理</option>
+        <option value="1" selected="@(Model.Status == ProjectTaskStatus.InProgress)">进行中</option>
+        <option value="2" selected="@(Model.Status == ProjectTaskStatus.Completed)">已完成</option>
+    </select>
+    <span asp-validation-for="Status" class="text-danger small"></span>
+</div>

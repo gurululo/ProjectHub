@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using ProjectHub.Web.Models;
+using ProjectHub.Web.Models.ViewModels;
 using ProjectHub.Web.Services;
 
 namespace ProjectHub.Web.Controllers
@@ -8,10 +9,12 @@ namespace ProjectHub.Web.Controllers
     public class ProjectsController : Controller
     {
         private readonly ProjectService _projectService;
+        private readonly TaskService _taskService;
 
-        public ProjectsController(ProjectService projectService)
+        public ProjectsController(ProjectService projectService, TaskService taskService)
         {
             _projectService = projectService;
+            _taskService = taskService;
         }
 
         public IActionResult Index()
@@ -28,7 +31,11 @@ namespace ProjectHub.Web.Controllers
                 return NotFound();
             }
 
-            return View(project);
+            return View(new ProjectDetailsViewModel
+            {
+                Project = project,
+                Tasks = _taskService.GetByProjectId(id)
+            });
         }
 
         [HttpGet]
@@ -114,7 +121,11 @@ namespace ProjectHub.Web.Controllers
                 return NotFound();
             }
 
-            return View(project);
+            return View(new ProjectDetailsViewModel
+            {
+                Project = project,
+                Tasks = _taskService.GetByProjectId(id)
+            });
         }
 
         [HttpPost]
@@ -129,7 +140,9 @@ namespace ProjectHub.Web.Controllers
             }
 
             _projectService.Delete(id);
-            TempData["SuccessMessage"] = "项目“" + project.Name + "”已删除。";
+            _taskService.DeleteByProjectId(id);
+
+            TempData["SuccessMessage"] = "项目“" + project.Name + "”及其关联任务已删除。";
 
             return RedirectToAction(nameof(Index));
         }

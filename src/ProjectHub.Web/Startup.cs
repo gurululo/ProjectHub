@@ -24,6 +24,7 @@ namespace ProjectHub.Web
             services.AddSingleton<IJsonDataStore, JsonDataStore>();
             services.AddSingleton<AdminAccountService>();
             services.AddSingleton<ProjectService>();
+            services.AddSingleton<TaskService>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>

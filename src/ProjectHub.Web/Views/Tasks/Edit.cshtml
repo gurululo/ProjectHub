@@ -1,0 +1,32 @@
+@model ProjectTask
+@{
+    ViewData["Title"] = "编辑任务";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h4 page-title mb-1">编辑任务</h1>
+        <p class="page-subtitle mb-0">更新任务信息与执行状态</p>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" asp-action="Details" asp-route-id="@Model.Id">返回详情</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            @await Html.PartialAsync("_FormFields", Model)
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">保存修改</button>
+                <a class="btn btn-light" asp-action="Details" asp-route-id="@Model.Id">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

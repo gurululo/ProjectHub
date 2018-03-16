@@ -1,0 +1,80 @@
+@model TaskListViewModel
+@{
+    ViewData["Title"] = "任务管理";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h4 page-title mb-1">任务管理</h1>
+        <p class="page-subtitle mb-0">共 @Model.Tasks.Count 个任务</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">＋ 新增任务</a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover app-table mb-0">
+            <thead>
+                <tr>
+                    <th>任务名称</th>
+                    <th>所属项目</th>
+                    <th>截止日期</th>
+                    <th>状态</th>
+                    <th class="text-right">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Tasks.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-5">暂无任务，点击右上角“新增任务”开始创建。</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var task in Model.Tasks)
+                    {
+                        var projectName = Model.ProjectNames.ContainsKey(task.ProjectId)
+                            ? Model.ProjectNames[task.ProjectId]
+                            : "未知项目";
+
+                        <tr>
+                            <td>
+                                <a class="font-weight-bold" asp-action="Details" asp-route-id="@task.Id">@task.Name</a>
+                                @if (!string.IsNullOrWhiteSpace(task.Description))
+                                {
+                                    <div class="text-muted small text-truncate" style="max-width: 360px;">@task.Description</div>
+                                }
+                            </td>
+                            <td>
+                                @if (Model.ProjectNames.ContainsKey(task.ProjectId))
+                                {
+                                    <a asp-controller="Projects" asp-action="Details" asp-route-id="@task.ProjectId">@projectName</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">@projectName</span>
+                                }
+                            </td>
+                            <td>
+                                @task.DueDate.ToString("yyyy-MM-dd")
+                                @if (task.Status != ProjectTaskStatus.Completed && task.DueDate.Date < DateTime.Today)
+                                {
+                                    <span class="badge badge-soft-danger ml-1">已逾期</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @task.Status.ToBadgeClass()">@task.Status.GetDisplayName()</span>
+                            </td>
+                            <td class="text-right text-nowrap">
+                                <a class="btn btn-link btn-sm" asp-action="Details" asp-route-id="@task.Id">查看</a>
+                                <a class="btn btn-link btn-sm" asp-action="Edit" asp-route-id="@task.Id">编辑</a>
+                                <a class="btn btn-link btn-sm text-danger" asp-action="Delete" asp-route-id="@task.Id">删除</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

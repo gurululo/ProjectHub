@@ -4,8 +4,9 @@
 
 <div class="app-jumbotron">
     <h1 class="h3 mb-2">欢迎回来，@User.Identity.Name</h1>
-    <p class="lead text-muted mb-3">您已通过管理员身份验证，可以开始管理企业项目。</p>
+    <p class="lead text-muted mb-3">您已通过管理员身份验证，可以开始管理企业项目与执行任务。</p>
     <hr class="my-4" />
-    <p class="text-muted">项目管理模块已上线，可创建并维护项目基础信息。任务管理与首页统计将在后续阶段加入。</p>
+    <p class="text-muted">项目管理与任务管理模块均已上线。首页统计看板将在后续阶段加入。</p>
     <a class="btn btn-primary" asp-controller="Projects" asp-action="Index">进入项目管理</a>
+    <a class="btn btn-outline-primary ml-2" asp-controller="Tasks" asp-action="Index">查看任务</a>
 </div>
