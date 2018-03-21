@@ -7,5 +7,9 @@ namespace ProjectHub.Web.Models.ViewModels
         public IList<ProjectTask> Tasks { get; set; } = new List<ProjectTask>();
 
         public IDictionary<int, string> ProjectNames { get; set; } = new Dictionary<int, string>();
+
+        public string Keyword { get; set; }
+
+        public ProjectTaskStatus? Status { get; set; }
     }
 }

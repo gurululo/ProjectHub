@@ -98,7 +98,21 @@ namespace ProjectHub.Web.Services
         private static void WriteFile<T>(string path, T data)
         {
             var json = JsonConvert.SerializeObject(data, Formatting.Indented);
-            File.WriteAllText(path, json, Utf8NoBom);
+            var tempPath = path + ".tmp";
+            var backupPath = path + ".bak";
+
+            // 先写入临时文件，再原子替换目标文件，避免异常退出产生半截 JSON。
+            // File.Replace 同时保留上一版本为 .bak 备份。
+            File.WriteAllText(tempPath, json, Utf8NoBom);
+
+            if (File.Exists(path))
+            {
+                File.Replace(tempPath, path, backupPath, true);
+            }
+            else
+            {
+                File.Move(tempPath, path);
+            }
         }
 
         private string GetPath(string fileName)

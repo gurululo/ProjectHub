@@ -22,6 +22,7 @@ logs/
 *.log
 *.tmp
 *.temp
+*.bak
 *.swp
 *~
 .DS_Store
@@ -29,6 +30,8 @@ Thumbs.db
 
 # ---- 本地运行数据（可能包含账号与业务敏感信息） ----
 src/ProjectHub.Web/App_Data/*.json
+src/ProjectHub.Web/App_Data/*.tmp
+src/ProjectHub.Web/App_Data/*.bak
 
 # ---- 测试与覆盖率（本项目当前未包含测试） ----
 TestResults/

@@ -37,7 +37,13 @@ namespace ProjectHub.Web.Services
                 return false;
             }
 
-            return PasswordHasher.Verify(password, account.PasswordSalt, account.PasswordHash, account.Iterations);
+            if (!PasswordHasher.Verify(password, account.PasswordSalt, account.PasswordHash, account.Iterations))
+            {
+                return false;
+            }
+
+            UpgradePasswordHashIfNeeded(account, password);
+            return true;
         }
 
         public void RecordLogin(string userName)
@@ -53,6 +59,36 @@ namespace ProjectHub.Web.Services
                 account.LastLoginAt = DateTime.Now;
                 _dataStore.Write(DataFileName, account);
             }
+        }
+
+        private void UpgradePasswordHashIfNeeded(AdminAccount account, string password)
+        {
+            if (account.Iterations >= PasswordHasher.DefaultIterations)
+            {
+                return;
+            }
+
+            var upgraded = PasswordHasher.Create(password);
+
+            lock (WriteSync)
+            {
+                var latest = _dataStore.Read(DataFileName, CreateDefaultAccount);
+                if (latest == null ||
+                    !string.Equals(latest.UserName, account.UserName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
+                latest.PasswordHash = upgraded.Hash;
+                latest.PasswordSalt = upgraded.Salt;
+                latest.Iterations = upgraded.Iterations;
+                _dataStore.Write(DataFileName, latest);
+            }
+
+            _logger.LogInformation(
+                "管理员密码哈希迭代次数已从 {OldIterations} 升级为 {NewIterations}。",
+                account.Iterations,
+                upgraded.Iterations);
         }
 
         private AdminAccount LoadOrCreate()

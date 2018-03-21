@@ -20,16 +20,35 @@ namespace ProjectHub.Web.Controllers
             _projectService = projectService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string keyword, ProjectTaskStatus? status)
         {
+            var normalizedKeyword = keyword == null ? null : keyword.Trim();
+
             var tasks = _taskService.GetAll();
             var projectNames = _projectService.GetAll()
                 .ToDictionary(project => project.Id, project => project.Name);
 
+            if (!string.IsNullOrWhiteSpace(normalizedKeyword))
+            {
+                tasks = tasks
+                    .Where(task => ContainsKeyword(task.Name, normalizedKeyword) ||
+                                   ContainsKeyword(task.Description, normalizedKeyword) ||
+                                   (projectNames.ContainsKey(task.ProjectId) &&
+                                    ContainsKeyword(projectNames[task.ProjectId], normalizedKeyword)))
+                    .ToList();
+            }
+
+            if (status.HasValue)
+            {
+                tasks = tasks.Where(task => task.Status == status.Value).ToList();
+            }
+
             return View(new TaskListViewModel
             {
                 Tasks = tasks,
-                ProjectNames = projectNames
+                ProjectNames = projectNames,
+                Keyword = normalizedKeyword,
+                Status = status
             });
         }
 
@@ -199,6 +218,12 @@ namespace ProjectHub.Web.Controllers
                     Selected = selectedProjectId.HasValue && selectedProjectId.Value == project.Id
                 })
                 .ToList();
+        }
+
+        private static bool ContainsKeyword(string value, string keyword)
+        {
+            return !string.IsNullOrEmpty(value) &&
+                   value.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

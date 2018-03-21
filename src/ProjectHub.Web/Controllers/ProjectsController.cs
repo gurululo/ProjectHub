@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using ProjectHub.Web.Models;
 using ProjectHub.Web.Models.ViewModels;
@@ -17,10 +19,50 @@ namespace ProjectHub.Web.Controllers
             _taskService = taskService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string keyword, ProjectStatus? status)
         {
+            var normalizedKeyword = keyword == null ? null : keyword.Trim();
+
             var projects = _projectService.GetAll();
-            return View(projects);
+            if (!string.IsNullOrWhiteSpace(normalizedKeyword))
+            {
+                projects = projects
+                    .Where(project => ContainsKeyword(project.Name, normalizedKeyword) ||
+                                      ContainsKeyword(project.Description, normalizedKeyword))
+                    .ToList();
+            }
+
+            if (status.HasValue)
+            {
+                projects = projects.Where(project => project.Status == status.Value).ToList();
+            }
+
+            var tasksByProject = _taskService.GetAll()
+                .GroupBy(task => task.ProjectId)
+                .ToDictionary(group => group.Key, group => group.ToList());
+
+            var items = projects.Select(project =>
+            {
+                List<ProjectTask> projectTasks;
+                if (!tasksByProject.TryGetValue(project.Id, out projectTasks))
+                {
+                    projectTasks = new List<ProjectTask>();
+                }
+
+                return new ProjectListItemViewModel
+                {
+                    Project = project,
+                    TaskCount = projectTasks.Count,
+                    CompletedTaskCount = projectTasks.Count(task => task.Status == ProjectTaskStatus.Completed)
+                };
+            }).ToList();
+
+            return View(new ProjectListViewModel
+            {
+                Items = items,
+                Keyword = normalizedKeyword,
+                Status = status
+            });
         }
 
         public IActionResult Details(int id)
@@ -145,6 +187,12 @@ namespace ProjectHub.Web.Controllers
             TempData["SuccessMessage"] = "项目“" + project.Name + "”及其关联任务已删除。";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private static bool ContainsKeyword(string value, string keyword)
+        {
+            return !string.IsNullOrEmpty(value) &&
+                   value.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

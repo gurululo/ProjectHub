@@ -1,6 +1,7 @@
 @model TaskListViewModel
 @{
     ViewData["Title"] = "任务管理";
+    ViewData["ActiveMenu"] = "Tasks";
 }
 
 <div class="page-header d-flex justify-content-between align-items-center mb-3">
@@ -9,6 +10,30 @@
         <p class="page-subtitle mb-0">共 @Model.Tasks.Count 个任务</p>
     </div>
     <a class="btn btn-primary" asp-action="Create">＋ 新增任务</a>
+</div>
+
+<div class="card filter-card mb-3">
+    <div class="card-body py-3">
+        <form method="get" asp-action="Index" class="form-row align-items-end">
+            <div class="col-lg-4 col-md-5 mb-2 mb-md-0">
+                <label class="small text-muted mb-1" for="keyword">关键字</label>
+                <input type="text" class="form-control form-control-sm" id="keyword" name="keyword" value="@Model.Keyword" placeholder="任务名称、描述或所属项目" />
+            </div>
+            <div class="col-lg-3 col-md-3 mb-2 mb-md-0">
+                <label class="small text-muted mb-1" for="status">任务状态</label>
+                <select class="form-control form-control-sm" id="status" name="status">
+                    <option value="" selected="@(Model.Status == null)">全部状态</option>
+                    <option value="0" selected="@(Model.Status == ProjectTaskStatus.Pending)">待处理</option>
+                    <option value="1" selected="@(Model.Status == ProjectTaskStatus.InProgress)">进行中</option>
+                    <option value="2" selected="@(Model.Status == ProjectTaskStatus.Completed)">已完成</option>
+                </select>
+            </div>
+            <div class="col-lg-5 col-md-4">
+                <button type="submit" class="btn btn-primary btn-sm">查询</button>
+                <a class="btn btn-light btn-sm" asp-action="Index">重置</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card">
@@ -27,7 +52,7 @@
                 @if (Model.Tasks.Count == 0)
                 {
                     <tr>
-                        <td colspan="5" class="text-center text-muted py-5">暂无任务，点击右上角“新增任务”开始创建。</td>
+                        <td colspan="5" class="text-center text-muted py-5">暂无符合条件的任务</td>
                     </tr>
                 }
                 else

@@ -1,12 +1,190 @@
+@model DashboardViewModel
 @{
-    ViewData["Title"] = "首页";
+    ViewData["Title"] = "工作台";
+    ViewData["ActiveMenu"] = "Dashboard";
 }
 
-<div class="app-jumbotron">
-    <h1 class="h3 mb-2">欢迎回来，@User.Identity.Name</h1>
-    <p class="lead text-muted mb-3">您已通过管理员身份验证，可以开始管理企业项目与执行任务。</p>
-    <hr class="my-4" />
-    <p class="text-muted">项目管理与任务管理模块均已上线。首页统计看板将在后续阶段加入。</p>
-    <a class="btn btn-primary" asp-controller="Projects" asp-action="Index">进入项目管理</a>
-    <a class="btn btn-outline-primary ml-2" asp-controller="Tasks" asp-action="Index">查看任务</a>
+<div class="page-header d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h1 class="h4 page-title mb-1">工作台</h1>
+        <p class="page-subtitle mb-0">项目与任务执行概况</p>
+    </div>
+    <div class="text-nowrap">
+        <a class="btn btn-primary btn-sm" asp-controller="Projects" asp-action="Create">＋ 新增项目</a>
+        <a class="btn btn-outline-primary btn-sm" asp-controller="Tasks" asp-action="Create">＋ 新增任务</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="stat-icon stat-icon-blue">项</div>
+                <div>
+                    <div class="stat-label">项目总数</div>
+                    <div class="stat-value">@Model.ProjectCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="stat-icon stat-icon-cyan">任</div>
+                <div>
+                    <div class="stat-label">任务总数</div>
+                    <div class="stat-value">@Model.TaskCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="stat-icon stat-icon-green">完</div>
+                <div>
+                    <div class="stat-label">已完成任务</div>
+                    <div class="stat-value">@Model.CompletedTaskCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="stat-icon stat-icon-orange">进</div>
+                <div>
+                    <div class="stat-label">进行中项目</div>
+                    <div class="stat-value">@Model.InProgressProjectCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-3">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>最近项目</span>
+                <a class="small" asp-controller="Projects" asp-action="Index">查看全部</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover app-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>项目名称</th>
+                            <th>结束日期</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentProjects.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-5">暂无项目记录</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var project in Model.RecentProjects)
+                            {
+                                <tr>
+                                    <td>
+                                        <a class="font-weight-bold" asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id">@project.Name</a>
+                                    </td>
+                                    <td>@project.EndDate.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        <span class="badge @project.Status.ToBadgeClass()">@project.Status.GetDisplayName()</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-3">
+        <div class="card h-100">
+            <div class="card-header">任务完成情况</div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-end mb-2">
+                    <span class="text-muted small">整体完成率</span>
+                    <span class="completion-rate">@Model.TaskCompletionRate%</span>
+                </div>
+                <div class="progress progress-thin">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: @(Model.TaskCompletionRate)%" aria-valuenow="@Model.TaskCompletionRate" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="row text-center mt-4">
+                    <div class="col-4">
+                        <div class="stat-mini-value">@Model.TaskCount</div>
+                        <div class="stat-mini-label">任务总数</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-mini-value text-success">@Model.CompletedTaskCount</div>
+                        <div class="stat-mini-label">已完成</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-mini-value text-primary">@Model.OpenTaskCount</div>
+                        <div class="stat-mini-label">未完成</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>最近任务</span>
+        <a class="small" asp-controller="Tasks" asp-action="Index">查看全部</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover app-table mb-0">
+            <thead>
+                <tr>
+                    <th>任务名称</th>
+                    <th>所属项目</th>
+                    <th>截止日期</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.RecentTasks.Count == 0)
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-5">暂无任务记录</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var task in Model.RecentTasks)
+                    {
+                        var projectName = Model.ProjectNames.ContainsKey(task.ProjectId)
+                            ? Model.ProjectNames[task.ProjectId]
+                            : "未知项目";
+
+                        <tr>
+                            <td>
+                                <a class="font-weight-bold" asp-controller="Tasks" asp-action="Details" asp-route-id="@task.Id">@task.Name</a>
+                            </td>
+                            <td>@projectName</td>
+                            <td>
+                                @task.DueDate.ToString("yyyy-MM-dd")
+                                @if (task.Status != ProjectTaskStatus.Completed && task.DueDate.Date < DateTime.Today)
+                                {
+                                    <span class="badge badge-soft-danger ml-1">已逾期</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @task.Status.ToBadgeClass()">@task.Status.GetDisplayName()</span>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

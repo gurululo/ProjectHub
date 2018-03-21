@@ -1,19 +1,86 @@
 # ProjectHub 企业项目管理系统
 
-ProjectHub 是一个面向企业内部的项目管理后台，用于集中维护项目信息、跟踪任务执行情况。系统采用 ASP.NET Core MVC 2.1 单体架构，页面通过 Razor Views 服务端渲染，数据以 JSON 文件形式保存在本地，不依赖数据库。
+ProjectHub 是一个面向企业内部的项目管理后台，用于集中维护项目信息、跟踪任务执行情况，并通过首页看板快速掌握整体进展。系统采用 ASP.NET Core MVC 2.1 单体架构，页面由 Razor Views 服务端渲染，数据以 JSON 文件保存在本地，不依赖数据库。
 
-> 当前进度：管理员登录、项目管理与任务管理模块已完成，首页统计看板将在后续阶段加入。
+## 功能概览
 
-## 已实现功能
+### 管理员
 
-- 管理员登录、退出登录及基于 Cookie 的身份验证
-- 后台页面默认要求登录后访问
+- 系统内置一个管理员账号，支持登录、退出登录及“记住我”
+- 后台页面默认要求登录后访问，使用 Cookie 身份验证
 - 管理员密码使用 PBKDF2-SHA256 加盐哈希保存，不存储明文密码
-- 项目的查看、新增、编辑与删除
-- 项目包含名称、描述、开始日期、结束日期与状态（未开始、进行中、已完成）
-- 项目任务的查看、新增、编辑与删除
-- 任务包含名称、描述、截止日期与状态（待处理、进行中、已完成）
-- 项目详情页展示所属任务及完成进度，支持全局任务列表
+- 旧版本账号在成功登录后自动升级密码哈希强度
+
+### 项目管理
+
+- 项目新增、查看、编辑与删除
+- 项目字段：名称、描述、开始日期、结束日期、状态
+- 项目状态：未开始、进行中、已完成
+- 项目列表支持关键字与状态筛选，并展示任务完成进度
+- 删除项目时同步清理该项目下的任务
+
+### 任务管理
+
+- 每个项目可创建多个任务
+- 任务新增、查看、编辑与删除
+- 任务字段：名称、描述、截止日期、状态
+- 任务状态：待处理、进行中、已完成
+- 项目详情页展示所属任务及完成进度
+- 全局任务列表支持关键字与状态筛选，并标记已逾期任务
+
+### 首页看板
+
+- 展示项目总数、任务总数、已完成任务数
+- 展示进行中项目数、整体任务完成率
+- 提供最近项目与最近任务列表
+
+## 技术架构
+
+| 层次 | 选型 |
+| --- | --- |
+| 后端 | C# / ASP.NET Core MVC 2.1 |
+| 视图 | Razor Views（服务端渲染） |
+| 前端 | Bootstrap 4、jQuery、jQuery Validation |
+| 数据 | 本地 JSON 文件（无数据库） |
+
+项目采用传统 MVC 单体结构，数据访问通过 `IJsonDataStore` 与业务服务类完成，未引入 ORM 或数据库。
+
+## 目录结构
+
+```text
+ProjectHub.sln
+src/ProjectHub.Web/
+├── Controllers/              # 账号、首页、项目、任务控制器
+├── Models/                   # 实体、枚举与视图模型
+├── Services/                 # JSON 存储、密码哈希与业务服务
+├── Helpers/                  # 状态显示等辅助扩展
+├── Views/                    # Razor 页面
+│   ├── Account/              # 登录页
+│   ├── Home/                 # 首页看板
+│   ├── Projects/             # 项目列表、详情与操作表单
+│   ├── Tasks/                # 任务列表、详情与操作表单
+│   └── Shared/               # 布局、验证脚本等共享页面
+├── wwwroot/                  # CSS、JS、Bootstrap、jQuery
+├── App_Data/                 # 运行时 JSON 数据目录（已忽略）
+├── Program.cs                # 应用入口
+└── Startup.cs                # 服务注册与中间件配置
+```
+
+## 环境要求
+
+- .NET Core SDK 2.1.x
+- 现代浏览器（Chrome、Edge、Firefox 等）
+- 首次执行 `dotnet restore` 需要访问 NuGet.org
+- Bootstrap、jQuery 等前端静态资源已随仓库提供，无需安装 Node.js/npm
+
+## 安装与启动
+
+```bash
+dotnet restore
+dotnet run --project src/ProjectHub.Web
+```
+
+启动后访问：<http://localhost:18437>（端口可在 `src/ProjectHub.Web/Properties/launchSettings.json` 中调整）
 
 ## 默认管理员
 
@@ -22,46 +89,18 @@ ProjectHub 是一个面向企业内部的项目管理后台，用于集中维护
 | 用户名 | `admin` |
 | 初始密码 | `admin123` |
 
-首次校验管理员账号时，系统会在 `App_Data/admin.json` 中自动创建管理员数据，请勿将该文件提交到仓库。
+首次校验管理员账号时，系统会在 `App_Data/admin.json` 中自动创建管理员数据。初始密码仅用于本地演示，请勿在生产环境中直接使用默认口令。
 
-## 技术架构
+## 数据存储
 
-| 层次 | 选型 |
+运行时数据保存在 `src/ProjectHub.Web/App_Data` 目录：
+
+| 文件 | 说明 |
 | --- | --- |
-| 后端 | C# / ASP.NET Core MVC 2.1 |
-| 视图 | Razor Views（服务端渲染） |
-| 前端 | Bootstrap 4、jQuery |
-| 数据 | 本地 JSON 文件（无数据库） |
+| `admin.json` | 管理员账号、密码哈希、盐值与登录时间 |
+| `projects.json` | 项目数据 |
+| `tasks.json` | 任务数据 |
 
-## 目录结构
+上述 JSON 文件由系统自动创建，并已在 `.gitignore` 中排除，请勿将实际运行数据提交到仓库。`App_Data` 位于静态资源目录之外，不会被 Web 服务器直接公开访问。
 
-```text
-ProjectHub.sln
-src/ProjectHub.Web/
-├── Controllers/          # MVC 控制器
-├── Models/               # 实体与视图模型
-├── Services/             # JSON 存储、管理员账号与密码哈希
-├── Views/                # Razor 页面
-├── wwwroot/              # 静态资源（CSS、JS、Bootstrap、jQuery）
-├── App_Data/             # 运行时 JSON 数据目录
-├── Program.cs            # 应用入口
-└── Startup.cs            # 启动配置
-```
-
-## 环境要求
-
-- .NET Core SDK 2.1.x
-- 现代浏览器（Chrome、Edge、Firefox 等）
-
-## 本地启动
-
-```bash
-dotnet restore
-dotnet run --project src/ProjectHub.Web
-```
-
-启动后访问：<http://localhost:5000>
-
-## 说明
-
-`App_Data` 目录中的 JSON 数据文件在运行过程中自动创建，并已在 `.gitignore` 中排除，请勿将实际运行数据提交到仓库。
+数据写入采用“临时文件 + 原子替换”方式，并在同目录保留上一版本的 `.bak` 备份，降低写入中断导致数据文件损坏的风险。

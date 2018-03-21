@@ -11,7 +11,8 @@ namespace ProjectHub.Web.Services
         private const int SaltSize = 16;
         private const int HashSize = 32;
 
-        public const int DefaultIterations = 10000;
+        // 旧账号仍按存储的迭代次数校验，并在下一次成功登录后自动升级。
+        public const int DefaultIterations = 100000;
 
         public static PasswordHashResult Create(string password)
         {
