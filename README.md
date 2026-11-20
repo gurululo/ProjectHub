@@ -101,6 +101,4 @@ dotnet run --project src/ProjectHub.Web
 | `projects.json` | 项目数据 |
 | `tasks.json` | 任务数据 |
 
-上述 JSON 文件由系统自动创建，并已在 `.gitignore` 中排除，请勿将实际运行数据提交到仓库。`App_Data` 位于静态资源目录之外，不会被 Web 服务器直接公开访问。
-
-数据写入采用“临时文件 + 原子替换”方式，并在同目录保留上一版本的 `.bak` 备份，降低写入中断导致数据文件损坏的风险。
+上述 JSON 文件由系统自动创建，并已在 `.gitignore` 中排除，请勿将实际运行数据提交到仓库。
